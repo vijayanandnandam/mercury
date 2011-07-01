@@ -7,6 +7,7 @@
 #
 #= require_self
 #= require ./native_extensions
+#= require ./inline_editor
 #= require ./page_editor
 #= require ./history_buffer
 #= require ./table_editor
@@ -41,6 +42,7 @@ jQuery.extend Mercury, {
   modalHandlers: {}
   dialogHandlers: {}
   preloadedViews: {}
+  afterLoadCallbacks: []
 
   # Custom event and logging methods
   bind: (eventName, callback) ->
@@ -50,11 +52,16 @@ jQuery.extend Mercury, {
   trigger: (eventName, options) ->
     Mercury.log(eventName, options)
     jQuery(document).trigger("mercury:#{eventName}", options)
+    callback() for callback in @afterLoadCallbacks if eventName == 'load'
 
 
   log: ->
     if Mercury.debug && console
       return if arguments[0] == 'hide:toolbar' || arguments[0] == 'show:toolbar'
       try console.debug(arguments) catch e
+
+
+  afterLoad: (callback) ->
+    @afterLoadCallbacks.push(callback)
 
 }

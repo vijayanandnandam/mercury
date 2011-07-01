@@ -29,70 +29,119 @@
  */
 (function() {
   if (!document.getElementsByTagName) return;
-
   var head = document.getElementsByTagName("head")[0];
-  if (window == top) {
-    var style = document.createElement('style');
-    style.innerText = 'body{visibility:hidden;display:none}';
-    head.appendChild(style);
-  }
+  var loaderScript = null;
 
-  var timer;
-  function loadMercury() {
-    if (document.mercuryLoaded) return;
-    if (timer) window.clearTimeout(timer);
-    document.mercuryLoaded = true;
+  var scripts = document.getElementsByTagName('script');
+  for (var i = 0; i <= scripts.length - 1; i += 1) {
+    var match = scripts[i].src.match(/mercury_loader\.js\??(.*)?$/);
+    if (!match || !match[1]) continue;
 
-    if (window == top) {
-      setTimeout(function() {
-        document.body.innerHTML = '&nbsp;';
-        for (var i = 0; i <= document.styleSheets.length - 1; i += 1) {
-          document.styleSheets[i].disabled = true
-        }
+    loaderScript = scripts[i];
+    var args = {};
+    match[1].replace(/([^&=]*)=([^&=]*)/g, function (m, attr, value) {
+      if (args[attr] === undefined) {
+        args[attr] = value;
+      } else {
+        if (typeof(args[attr]) != 'object') args[attr] = [args[attr]];
+        args[attr].push(value);
+      }
+    });
 
-        var link = document.createElement('link');
-        link.href = '/assets/mercury.css';
-        link.media = 'screen';
-        link.rel = 'stylesheet';
-        link.type = 'text/css';
-        head.appendChild(link);
-
-        var script = document.createElement('script');
-        script.src = '/assets/mercury.js';
-        script.type = 'text/javascript';
-        head.appendChild(script);
-        script.onload = function() {
-          document.body.style.visibility = 'visible';
-          document.body.style.display = 'block';
-          new Mercury.PageEditor()
-        }
-      }, 1);
-    } else if (top.Mercury) {
-      window.Mercury = top.Mercury;
-      Mercury.trigger('initialize:frame');
+    // if no option was passed, default to PageEditor
+    if (!args['as']) args['as'] = 'PageEditor';
+    switch (args['as']) {
+      case 'PageEditor':
+        loadPageEditor();
+        break;
+      case 'InlineEditor':
+        loadInlineEditor();
+        break;
     }
   }
 
-  function checkReadyState() {
-    if (document.readyState === 'complete') {
-      document.stopObserving('readystatechange', checkReadyState);
+  function loadPageEditor() {
+    if (window == top) {
+      var style = document.createElement('style');
+      style.innerText = 'body{visibility:hidden;display:none}';
+      head.appendChild(style);
+    }
+
+    var timer;
+    function loadMercury() {
+      if (document.mercuryLoaded) return;
+      if (timer) window.clearTimeout(timer);
+      document.mercuryLoaded = true;
+
+      if (window == top) {
+        setTimeout(function() {
+          document.body.innerHTML = '&nbsp;';
+          for (var i = 0; i <= document.styleSheets.length - 1; i += 1) {
+            document.styleSheets[i].disabled = true
+          }
+
+          var link = document.createElement('link');
+          link.href = '/assets/mercury.css';
+          link.media = 'screen';
+          link.rel = 'stylesheet';
+          link.type = 'text/css';
+          head.appendChild(link);
+
+          var script = document.createElement('script');
+          script.src = '/assets/mercury.js';
+          script.type = 'text/javascript';
+          head.appendChild(script);
+          script.onload = function() {
+            document.body.style.visibility = 'visible';
+            document.body.style.display = 'block';
+            new Mercury.PageEditor()
+          }
+        }, 1);
+      } else if (top.Mercury) {
+        window.Mercury = top.Mercury;
+        Mercury.trigger('initialize:frame');
+      }
+    }
+
+    function checkReadyState() {
+      if (document.readyState === 'complete') {
+        document.stopObserving('readystatechange', checkReadyState);
+        loadMercury();
+      }
+    }
+
+    function pollDoScroll() {
+      try { document.documentElement.doScroll('left'); }
+      catch(e) {
+        timer = pollDoScroll.defer();
+        return;
+      }
       loadMercury();
     }
-  }
 
-  function pollDoScroll() {
-    try { document.documentElement.doScroll('left'); }
-    catch(e) {
-      timer = pollDoScroll.defer();
-      return;
+    if (document.addEventListener) {
+      document.addEventListener('DOMContentLoaded', loadMercury, false);
+    } else {
+      document.observe('readystatechange', checkReadyState);
+      if (window == top) { timer = pollDoScroll.defer(); }
     }
-    loadMercury();
   }
 
-  if (document.addEventListener) {
-    document.addEventListener('DOMContentLoaded', loadMercury, false);
-  } else {
-    document.observe('readystatechange', checkReadyState);
-    if (window == top) { timer = pollDoScroll.defer(); }
+  function loadInlineEditor() {
+    var link = document.createElement('link');
+    link.href = '/assets/mercury.css';
+    link.media = 'screen';
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    loaderScript.insertBefore(link);
+
+    var script = document.createElement('script');
+    script.src = '/assets/mercury.js';
+    script.type = 'text/javascript';
+    script.onload = function() {
+      new Mercury.InlineEditor()
+    };
+    loaderScript.insertBefore(script);
   }
+
 })();
