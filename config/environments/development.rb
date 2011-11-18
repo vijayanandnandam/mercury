@@ -27,5 +27,7 @@ if defined?(Mercury::Application)
 #    config.assets.js_compressor = :uglifier
 #    config.assets.compress = true
     config.assets.compress = false
+
+    ActiveRecord::Base.include_root_in_json = false
   end
 end

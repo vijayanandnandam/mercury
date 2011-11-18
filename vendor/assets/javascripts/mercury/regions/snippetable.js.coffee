@@ -63,6 +63,34 @@ class @Mercury.Regions.Snippetable extends Mercury.Region
     @element.addClass('focus')
 
 
+  content: (value = null, filterSnippets = false) ->
+    if value != null
+      # sanitize the html before we insert it
+      container = jQuery('<div>').appendTo(@document.createDocumentFragment())
+      container.html(value)
+
+      # fill in the snippet contents
+      for element in container.find('[data-snippet]')
+        element.contentEditable = false
+        element = jQuery(element)
+        if snippet = Mercury.Snippet.find(element.data('snippet'))
+          if element.data('version')
+            snippet.setVersion(parseInt(element.data('version')))
+          else
+            try
+              version = parseInt(element.html().match(/\/(\d+)\]/)[1])
+              if version
+                snippet.setVersion(version)
+                element.attr({'data-version': version})
+                element.html(snippet.data)
+            catch error
+
+      # set the html
+      @element.html(container.html())
+    else
+      super
+
+
   togglePreview: ->
     if @previewing
       @makeSortable()

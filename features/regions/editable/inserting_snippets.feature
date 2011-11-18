@@ -11,8 +11,7 @@ Feature:
   Scenario: A user can expect all this!
 
 
-  # todo: these can't be one scenario because snippet.load doesn't find/replace existing ones
-  Scenario: A user can drag and drop snippets into an editable region
+#  Scenario: A user can drag and drop snippets into an editable region
     Given the content of the editable region is simple content
     And I make a selection
 
@@ -28,7 +27,7 @@ Feature:
     And the contents of the editable region should be "this is <div data-version='1' data-snippet='snippet_14' class='mercury-snippet' contenteditable='false'><strong>Jeremy</strong> likes Stella</div><span>simple</span> <b>content</b>"
 
 
-  Scenario: A user can use the snippet toolbar to remove a snippet
+#  Scenario: A user can use the snippet toolbar to remove a snippet
     Given the options for the example snippet "snippet_42" are first_name: "Jeremy", favorite_beer: "Stella"
     And the content of the editable region has that snippet
 
@@ -39,7 +38,7 @@ Feature:
     Then the contents of the editable region should be " <b>content</b>"
 
 
-  Scenario: A user can use the snippet toolbar to edit the options of a snippet
+#  Scenario: A user can use the snippet toolbar to edit the options of a snippet
     Given the options for the example snippet "snippet_42" are first_name: "Hipsters", favorite_beer: "PBR"
     And the content of the editable region has that snippet
 
@@ -78,9 +77,8 @@ Feature:
     Then the contents of the editable region should be "<div data-version='2' data-snippet='snippet_42' class='mercury-snippet' contenteditable='false'><strong>Jeremy</strong> likes Stella</div> <b>content</b>"
 
     When I edit the snippet
-    # todo: this is a bug
-#    Then the "First Name" field should contain "Jeremy"
-#    And the "Favorite Beer" field should contain "Stella"
+    Then the "First Name" field should contain "Jeremy"
+    And the "Favorite Beer" field should contain "Stella"
 
     When I close the modal
     When I click on the "Redo" button

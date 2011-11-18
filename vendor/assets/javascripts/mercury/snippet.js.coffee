@@ -1,6 +1,7 @@
 class @Mercury.Snippet
 
-  @all: []
+  @size: 0
+  @all: {}
 
   @displayOptionsFor: (name) ->
     Mercury.modal Mercury.config.snippets.optionsUrl.replace(':name', name), {
@@ -12,22 +13,21 @@ class @Mercury.Snippet
 
 
   @create: (name, options) ->
-    identity = "snippet_#{@all.length}"
+    identity = "snippet_#{@size}"
     instance = new Mercury.Snippet(name, identity, options)
-    @all.push(instance)
+    @all[identity] = instance
+    @size += 1
     return instance
 
 
   @find: (identity) ->
-    for snippet in @all
-      return snippet if snippet.identity == identity
-    return null
+    return @all[identity] || null
 
 
   @load: (snippets) ->
     for own identity, details of snippets
-      instance = new Mercury.Snippet(details.name, identity, details.options)
-      @all.push(instance)
+      @size += 1
+      @all[identity] = new Mercury.Snippet(details.name, identity, details.options)
 
 
   constructor: (@name, @identity, options = {}) ->
