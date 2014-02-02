@@ -6,7 +6,7 @@ class @Mercury.Regions.Markdown extends Mercury.Region
 
   constructor: (@element, @window, @options = {}) ->
     super
-    @converter = new Showdown.converter()
+    @converter = new Showdown.converter Mercury.config.showdownOptions
 
 
   build: ->

@@ -333,8 +333,8 @@ window.Mercury = {
     // This is a nice way to add functionality, when the behaviors aren't region specific.  These can be triggered by a
     // button, or manually with `Mercury.trigger('action', {action: 'barrelRoll'})`
     globalBehaviors: {
-      exit: function() { window.location.href = this.iframeSrc() },
-      barrelRoll: function() { $('body').css({webkitTransform: 'rotate(360deg)'}) }
+      exit: function() { window.location.href = this.iframeSrc(); },
+      barrelRoll: function() { $('body').css({webkitTransform: 'rotate(360deg)'}); }
       },
 
 
@@ -420,7 +420,16 @@ window.Mercury = {
         img:    ['src', 'title', 'alt']
         }
       },
-
+      
+    // ## Options for Showdown(markdown library)
+    //
+    // Example of adding extra markdown extenstions
+    //
+    //     showdownOptions: {
+    //       extensions: 'twitter'
+    //       }
+    //
+    showdownOptions: {},
 
     // ## Injected Styles
     //
